@@ -1,0 +1,26 @@
+body {
+	margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Poppins", sans-serif;
+}
+
+p, span, div, b, em, li {
+	font-family: "Roboto", sans-serif;
+}
+
+.main-color {
+	color: #0a3066;
+}
+
+/* Flex */
+.flex {
+	display: flex;
+}
+
+.align-center {
+	align-items: center;
+}
+
+

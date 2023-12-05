@@ -1,0 +1,59 @@
+# This is a sample build configuration for JavaScript.
+# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: kodear/php7.4-packagist
+
+pipelines:
+    
+  custom:
+    install:
+      - variables:
+          - name: USER
+          - name: SERVER
+          - name: REMOTE_PATH
+          - name: SSH_KEY
+      - step:
+          name: Installation
+          caches:
+            - composer
+          script:
+            - mkdir -p /root/.ssh
+            - (umask  077 ; echo $SSH_KEY | base64 --decode > /root/.ssh/id_rsa)
+            - ~/.composer/vendor/bin/envoy run init --user=$USER --host=$SERVER --remote_path="$REMOTE_PATH" --repository=$BITBUCKET_GIT_SSH_ORIGIN --branch=$BITBUCKET_BRANCH
+
+    production-deploy:
+      - step:
+          name: Deploy Production
+          deployment: production
+          caches:
+            - composer
+          script:
+            - mkdir -p /root/.ssh
+            - (umask  077 ; echo $SSH_KEY | base64 --decode > /root/.ssh/id_rsa)
+            - ~/.composer/vendor/bin/envoy run deploy --user=$USER --host=$SERVER --remote_path=$REMOTE_PATH --repository=$BITBUCKET_GIT_SSH_ORIGIN --branch=$BITBUCKET_BRANCH
+
+
+  branches:
+    develop:
+      - step:
+          name: Deploy testing
+          deployment: test
+          caches:
+            - composer
+          script:
+            - mkdir -p /root/.ssh
+            - (umask  077 ; echo $SSH_KEY | base64 --decode > /root/.ssh/id_rsa)
+            - ~/.composer/vendor/bin/envoy run deploy --user=$USER --host=$SERVER --remote_path=$REMOTE_PATH --repository=$BITBUCKET_GIT_SSH_ORIGIN --branch=$BITBUCKET_BRANCH
+
+    staging:
+      - step:
+          name: Deploy staging
+          deployment: staging
+          caches:
+            - composer
+          script:
+            - mkdir -p /root/.ssh
+            - (umask  077 ; echo $SSH_KEY | base64 --decode > /root/.ssh/id_rsa)
+            - ~/.composer/vendor/bin/envoy run deploy --user=$USER --host=$SERVER --remote_path=$REMOTE_PATH --repository=$BITBUCKET_GIT_SSH_ORIGIN --branch=$BITBUCKET_BRANCH
